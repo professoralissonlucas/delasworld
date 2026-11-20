@@ -27,6 +27,82 @@ body::before,
 body::after,
 .sparkles { display: none; }
 
+/* =====================================================================
+   BASE DE LAYOUT (estava faltando)
+   Este arquivo tinha só a "camada de tema" (cores, bordas, sombras).
+   A camada de base, com display, alinhamento e tamanhos, nunca entrou no
+   projeto. Por isso o contador de estrelas virou uma estrela gigante,
+   os cards ficaram um embaixo do outro, etc. Esta parte vem ANTES das
+   regras de tema, então as cores e sombras de baixo continuam valendo.
+   ===================================================================== */
+
+/* Atributo hidden sempre esconde (algumas classes têm display próprio). */
+[hidden] { display: none !important; }
+
+body { min-height: 100vh; margin: 0; }
+button { font: inherit; cursor: pointer; }
+
+/* Container principal centralizado */
+.page-shell { margin: 0 auto; }
+
+/* Cabeçalho: logo | nome do site | estrelas + som */
+.hero { position: relative; display: flex; align-items: center; gap: 16px; }
+.brand-mark { display: grid; flex: 0 0 auto; place-items: center; font-weight: 800; }
+.hero-title { min-width: 0; flex: 1; }
+.eyebrow { margin: 0 0 4px; font-size: .72rem; font-weight: 600; letter-spacing: .12em; }
+.hero h1 { margin: 0; line-height: 1.05; }
+.hero-actions { display: flex; flex: 0 0 auto; align-items: center; margin-left: auto; }
+.star-counter { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 0 16px; font-weight: 700; }
+.star-counter svg { width: 20px; height: 20px; flex: 0 0 20px; color: #7b2cbf; }
+.star-counter strong { font-size: 1rem; line-height: 1; }
+.star-counter.gain { animation: star-gain .5s ease; } /* o script.js põe esta classe ao ganhar estrelas */
+@keyframes star-gain { 50% { transform: scale(1.12); } }
+.sound-button { display: grid; padding: 0; place-items: center; color: var(--text); }
+.sound-button svg { width: 20px; height: 20px; }
+
+/* Títulos do menu */
+.section-kicker { margin: 0 0 6px; font-size: .85rem; }
+.menu-heading h2 { margin: 0; line-height: 1.05; }
+
+/* Cards do menu: 2 lado a lado, mesmo tamanho */
+.game-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.game-card { display: flex; flex-direction: column; }
+.card-icon { display: grid; flex: 0 0 auto; place-items: center; }
+.card-copy { flex: 1; }
+.card-copy h3 { margin: 0 0 8px; line-height: 1.2; }
+.card-copy p { margin: 0; line-height: 1.55; }
+
+/* Botões "Jogar →" / "Acessar →" */
+.play-button { position: relative; display: inline-flex; min-width: 140px; align-self: flex-start; align-items: center; justify-content: center; gap: 10px; overflow: hidden; color: #fff; font-size: .95rem; font-weight: 700; }
+.play-button span { position: relative; z-index: 1; }
+.play-button::after { content: ""; position: absolute; top: 0; bottom: 0; }
+
+/* Tela do jogo */
+.game-panel { position: relative; padding: 28px; text-align: center; }
+.back-button { display: block; width: fit-content; margin: 0 auto 18px 0; padding: 10px 16px; font-weight: 600; }
+.game-symbol { font-size: 48px; }
+.game-panel h2 { margin: 2px 0 10px; font-size: clamp(1.6rem, 4vw, 2.3rem); }
+
+/* Quiz */
+.vibe-quiz { max-width: 760px; margin: 0 auto; }
+.quiz-progress-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; font-size: .78rem; }
+.quiz-progress { margin-bottom: 18px; overflow: hidden; border-radius: 999px; }
+.quiz-progress-fill { height: 100%; border-radius: inherit; transition: width .35s ease; }
+.quiz-options { display: grid; max-width: 640px; margin: 0 auto; }
+.quiz-option { width: 100%; font-size: .95rem; }
+.quiz-restart-button { padding: 12px 22px; border: 0; color: #fff; font-weight: 700; }
+
+/* Abas do Organizador: cada aba numa linha só (no celular rola para o lado) */
+.organizer-tabs { overflow-x: auto; }
+.organizer-tab { flex: 0 0 auto; white-space: nowrap; }
+
+/* Celular e tablet: cards empilhados */
+@media (max-width: 720px) {
+  .game-grid { grid-template-columns: 1fr; }
+  .game-panel { padding: 18px; }
+}
+/* ===================== fim da base de layout ===================== */
+
 .page-shell {
   width: min(1180px, calc(100% - 48px));
   padding: 28px 0 72px;
@@ -143,7 +219,6 @@ body::after,
 .quiz-icon { color: #7b2cbf; }
 
 .card-copy h3 {
-  min-height: 58px;
   color: var(--text);
   font-size: 1.35rem;
   letter-spacing: -.025em;
@@ -527,7 +602,7 @@ body::after,
   .hero { min-height: 104px; margin-bottom: 32px; }
   .hero-title { width: auto; }
   .hero h1 { font-size: 1.45rem; }
-  .hero-actions { position: absolute; right: 10px; bottom: 10px; }
+  .hero-actions { width: 100%; justify-content: flex-end; } /* estrelas + som numa 2ª linha, à direita (antes ficavam por cima do título) */
   .menu-heading { margin-bottom: 22px; }
   .menu-heading h2 { font-size: 1.9rem; }
   .game-card { min-height: 320px; }
