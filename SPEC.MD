@@ -15,8 +15,10 @@ HTML + CSS + JavaScript puro. Sem frameworks, sem npm, sem build.
 | Arquivo / pasta | Função |
 |---|---|
 | `index.html` (~305 linhas) | Toda a marcação: cabeçalho, menu com 2 cards e as telas do Quiz e do Organizador (ocultas com `hidden`). |
-| `catalogo.js` (~55 linhas) | Define `window.CATALOGO_PECAS`: 34 peças de `imagens/` com `id, nome, arquivo, categoria, cor, corHex, estampada, estilos`. É `.js` (e não `.json`) para funcionar abrindo o `index.html` direto, sem servidor. Carregado antes do `script.js`. |
-| `script.js` (~1280 linhas) | Toda a lógica, em JavaScript puro (sem módulos). |
+| `catalogo.js` (~60 linhas) | Define `window.CATALOGO_PECAS`: 34 peças de `imagens/` com `id, nome, arquivo, categoria, cor, corHex, estampada, estilos, formalidade (1–5), familiaCor, ocasioes, estacao`. É `.js` (e não `.json`) para funcionar abrindo o `index.html` direto, sem servidor. Carregado antes do `pecas-ilustradas.js`. |
+| `pecas-ilustradas.js` (~150 linhas) | Gera `window.PECAS_ILUSTRADAS`: 77 peças desenhadas em SVG (8 a 10 cores para cada uma das 9 categorias: tops, pants, shorts, skirts, dresses, outerwear, sneakers_shoes, sandals, bags), no mesmo formato do catálogo, com a imagem em data URI e `tipo: "ilustracao"`. Paleta: branco, preto, bege, cinza, jeans, rosa, lilás, azul-claro, verde-menta, vermelho e amarelo-manteiga. |
+| `regras.js` (~55 linhas) | Regras de moda: tabela de famílias de cor que combinam (`REGRAS_CORES`), `coresCombinam`, `familiaPorRgb` (descobre a família de cor de uma foto enviada) e `estacoesCombinam`. Carregado antes do `script.js`. |
+| `script.js` (~1420 linhas) | Toda a lógica, em JavaScript puro (sem módulos). |
 | `style.css` (~580 linhas) | Estilos, variáveis de cor em `:root` e responsividade (breakpoints de 980, 800, 720 e 520 px; respeita `prefers-reduced-motion`). |
 | `imagens/` | 35 fotos `.jpg` de roupas, no padrão `tipo-cor-numero.jpg` (ex.: `tenis-verde-01.jpg`). `look-completo-01.jpg` é um look inteiro e não está no catálogo. |
 | `README.md` | Apresentação curta do projeto. |
@@ -64,15 +66,27 @@ Tem três abas: **Guarda-roupa**, **Combinar uma peça** e **Meus looks**.
 - Gera 3 looks com nome temático e justificativa. Cada look pode ser favoritado.
 
 **Combinar uma peça (`#pieceMatchView`)**
-- A lista mostra as peças do `catalogo.js` + as enviadas pelo upload (`getAllPieces`). A peça clicada fica com borda rosa.
+- A lista mostra as peças do `catalogo.js` + as enviadas pelo upload (`getAllPieces`). A peça clicada fica com borda rosa. Se o filtro escolhido não tem nenhuma foto (ex.: Vestidos, Sandálias), a lista mostra as ilustrações daquela categoria.
+- **Fotos primeiro, desenhos só se precisar** (`pickBestPiece`): para cada vaga, só as fotos disputam. As ilustrações só entram quando nenhuma foto serve sem conflito (`hasConflict`: cor que briga, estação que não combina ou estampa dupla), e mesmo assim com 1 ponto a menos. Se a vaga não tem nenhuma foto, aparece "Ainda não tenho foto de [bolsa] no catálogo, então usei uma ilustração."
+- Os desenhos aparecem nos mesmos cards e com o mesmo tamanho das fotos. A única diferença é `object-fit: contain` com fundo rosinha (`illustrationStyle`), para não cortar as pontas.
+- O casaco do vestido/conjunto é opcional e só entra se não tiver conflito.
 - "Encontrar combinações" gera 3 looks (`generatePieceLooks`). As peças que completam o look dependem da categoria da escolhida (`getSlotsForPiece`):
   - top → parte de baixo + calçado + bolsa
   - parte de baixo → top + calçado + bolsa
   - vestido/conjunto → calçado + bolsa (+ casaco opcional)
   - calçado → top + parte de baixo + bolsa
   - bolsa, acessório ou casaco → top + parte de baixo + calçado
-- Pontuação simples (`scoreCandidate`): +1 por estilo em comum, +1 se tem o estilo escolhido na lista, +1 se for neutra (preto, branco, bege, cinza, jeans), −5 se criar duas estampas no look, −2 se a peça já apareceu em outro look. Sorteia entre as mais bem pontuadas, então "ver outras combinações" traz opções diferentes.
-- Cada look tem nome e uma frase explicando por que combina (`explainLook`).
+- Pontuação simples (`scoreCandidate`), cada candidata começa com 0:
+  - +1 por estilo em comum com a peça escolhida; +1 se tem o estilo marcado na lista;
+  - +2 se a família de cor combina com todas as peças do look (tabela `REGRAS_CORES` em `regras.js`), −3 se briga com alguma;
+  - +2 se a formalidade é parecida com a da peça escolhida (diferença de no máximo 1);
+  - +1 se tem pelo menos uma ocasião em comum com a peça escolhida;
+  - +1 se a estação combina com todas as peças do look, −3 se não combina (calor × frio). Exceção: blusa + casaco sempre combina, porque a blusa vai por baixo;
+  - −5 se criar duas estampas no look; −2 se a peça já apareceu em outro look.
+  - Sorteia entre as mais bem pontuadas, então "ver outras combinações" traz opções diferentes.
+- Família de cor (`getColorFamily`): campo `familiaCor` do catálogo; nas fotos enviadas é calculada pela cor dominante (`familiaPorRgb`); nas fotos de referência, pelo nome. Peça sem família conhecida não ajuda nem atrapalha.
+- Tabela de cores: neutro combina com todas; quente com quente e neutro; frio com frio, pastel e neutro; pastel com pastel, frio e neutro; vibrante só com neutro.
+- Cada look tem nome e uma frase com até 3 motivos (`explainLook`), ex.: "Combina por: tons pastel com neutros + nível de formalidade parecido + todas servem para passeio."
 - Sem peça escolhida, aparece "Escolha uma peça primeiro 💖". Se faltar uma categoria, aparece "Ainda não tenho [sapato] no catálogo" e o look usa uma foto de referência do Unsplash (`COMPLEMENTARY_REFERENCES`).
 - "Mais elegante" e "mais casual" trocam o estilo da lista e geram de novo. Cada card tem trocar peça, ver outras opções e salvar nos favoritos.
 - Guarda um histórico das últimas 12 sugestões, que podem ser reabertas.

@@ -787,7 +787,7 @@ function renderLooks(container, looks, areSaved) {
     const card = document.createElement("article");
     card.className = "look-card";
     const isFavorite = savedLooks.some((saved) => saved.id === look.id);
-    card.innerHTML = `<div class="look-preview">${look.pieces.slice(0, 4).map((piece, index) => `<img src="${piece.image}" alt="${piece.name}" style="--piece-index:${index}">`).join("")}</div>
+    card.innerHTML = `<div class="look-preview">${look.pieces.slice(0, 4).map((piece, index) => `<img src="${piece.image}" alt="${piece.name}" style="--piece-index:${index};${illustrationStyle(piece)}">`).join("")}</div>
       <div class="look-card-body"><div class="look-card-heading"><div><p class="section-kicker">Sua sugestão</p><h3>${look.name}</h3></div><button class="favorite-look ${isFavorite ? "active" : ""}" type="button" aria-label="Favoritar look">${isFavorite ? "♥" : "♡"}</button></div>
       <div class="look-piece-list"><strong>Peças:</strong> ${look.pieces.map((piece) => piece.name).join(" · ")}</div>
       <p class="look-reason">${look.reason}</p><p><strong>Acompanhe com:</strong> ${look.accessories}</p><div class="look-occasion">◷ ${look.occasions}</div>
@@ -859,8 +859,8 @@ try {
   pieceHistory = [];
 }
 
-// Peças do catalogo.js no mesmo formato das peças enviadas pelo upload.
-const catalogPieces = (window.CATALOGO_PECAS || []).map((peca) => ({
+// Transforma uma ficha (do catalogo.js ou do pecas-ilustradas.js) no formato das peças do upload.
+const fichaToPiece = (peca) => ({
   id: `catalogo-${peca.id}`,
   name: peca.nome,
   category: peca.categoria,
@@ -870,12 +870,32 @@ const catalogPieces = (window.CATALOGO_PECAS || []).map((peca) => ({
   style: peca.estilos.join(", "),
   styles: peca.estilos,
   image: peca.arquivo,
-  fromCatalog: true
-}));
+  formality: peca.formalidade,
+  colorFamily: peca.familiaCor,
+  occasions: peca.ocasioes,
+  season: peca.estacao,
+  fromCatalog: true,
+  isIllustration: peca.tipo === "ilustracao"
+});
 
-// Catálogo + peças que a pessoa enviou.
+// Fotos reais do catálogo e desenhos gerados pelo pecas-ilustradas.js.
+const catalogPieces = (window.CATALOGO_PECAS || []).map(fichaToPiece);
+const illustratedPieces = (window.PECAS_ILUSTRADAS || []).map(fichaToPiece);
+
+// Peças com FOTO: catálogo + peças que a pessoa enviou.
 function getAllPieces() {
   return [...catalogPieces, ...wardrobePieces];
+}
+
+// Desenhos aparecem inteiros no card (sem cortar as pontas), com o mesmo rosinha do fundo do desenho.
+// Fotos continuam como antes. O tamanho do card não muda.
+function illustrationStyle(piece) {
+  return piece.isIllustration ? "object-fit:contain;background:#fff6fa;" : "";
+}
+
+// Procura uma peça pelo id em todas as listas (fotos e ilustrações).
+function findPieceById(pieceId) {
+  return [...getAllPieces(), ...illustratedPieces].find((piece) => piece.id === pieceId) || null;
 }
 
 function persistPieceHistory() {
@@ -885,9 +905,14 @@ function persistPieceHistory() {
 
 function renderPiecePicker() {
   if (!pieceMatchPicker) return;
-  const pieces = pieceFilterCategory === "all"
+  let pieces = pieceFilterCategory === "all"
     ? getAllPieces()
     : getAllPieces().filter((piece) => piece.category === pieceFilterCategory);
+
+  // Categoria sem nenhuma foto (ex.: vestidos)? Mostra as ilustrações dela.
+  if (!pieces.length && pieceFilterCategory !== "all") {
+    pieces = illustratedPieces.filter((piece) => piece.category === pieceFilterCategory);
+  }
 
   if (!pieces.length) {
     pieceMatchPicker.innerHTML = '<p class="piece-alternative-note">Ainda não tenho peças desta categoria no catálogo. Use “Adicionar peça”.</p>';
@@ -899,21 +924,21 @@ function renderPiecePicker() {
     const button = document.createElement("button");
     button.type = "button";
     button.className = `piece-picker-card ${selectedBasePiece?.id === piece.id ? "selected" : ""}`;
-    button.innerHTML = `<img src="${piece.image}" alt="${piece.name}"><span>${piece.name}</span>`;
+    button.innerHTML = `<img src="${piece.image}" alt="${piece.name}" style="${illustrationStyle(piece)}"><span>${piece.name}</span>`;
     button.addEventListener("click", () => selectBasePiece(piece.id));
     pieceMatchPicker.appendChild(button);
   });
 }
 
 function selectBasePiece(pieceId) {
-  selectedBasePiece = getAllPieces().find((piece) => piece.id === pieceId) || null;
+  selectedBasePiece = findPieceById(pieceId);
   pieceLookResults.hidden = true;
 
   if (!selectedBasePiece) {
     selectedPieceStage.innerHTML = '<div class="selected-piece-placeholder"><span>✦</span><p>Escolha uma peça abaixo para começar</p></div>';
   } else {
     const secondary = selectedBasePiece.print !== "liso ou neutro" ? selectedBasePiece.print : (selectedBasePiece.color || "cor identificada");
-    selectedPieceStage.innerHTML = `<div class="selected-piece-feature"><img src="${selectedBasePiece.image}" alt="${selectedBasePiece.name}"><div class="selected-piece-details"><p class="section-kicker">Peça principal</p><h4>${selectedBasePiece.name}</h4><p><strong>Categoria:</strong> ${categoryLabels[selectedBasePiece.category]}</p><p><strong>Visual:</strong> ${secondary}</p><p><strong>Estilo:</strong> ${selectedBasePiece.style || "versátil"}</p></div></div>`;
+    selectedPieceStage.innerHTML = `<div class="selected-piece-feature"><img src="${selectedBasePiece.image}" alt="${selectedBasePiece.name}" style="${illustrationStyle(selectedBasePiece)}"><div class="selected-piece-details"><p class="section-kicker">Peça principal</p><h4>${selectedBasePiece.name}</h4><p><strong>Categoria:</strong> ${categoryLabels[selectedBasePiece.category]}</p><p><strong>Visual:</strong> ${secondary}</p><p><strong>Estilo:</strong> ${selectedBasePiece.style || "versátil"}</p></div></div>`;
   }
   renderPiecePicker();
 }
@@ -1009,61 +1034,167 @@ function isPrinted(piece) {
   return Boolean(piece.print) && piece.print !== "liso ou neutro";
 }
 
-// Neutros (preto, branco, bege, cinza, jeans...) combinam com tudo.
-function isNeutral(piece) {
-  const text = `${piece.color || ""} ${piece.name || ""}`.toLowerCase();
-  if (/preto|branco|bege|cinza|creme|nude|jeans/.test(text)) return true;
-  // Peças do upload guardam a cor como "rgb(r,g,b)": cor sem saturação = neutra.
-  const rgb = String(piece.color || "").match(/\d+/g);
-  if (rgb && rgb.length >= 3) {
-    const [r, g, b] = rgb.map(Number);
-    return Math.max(r, g, b) - Math.min(r, g, b) < 40;
-  }
-  return false;
+// Família de cor da peça: neutro, quente, frio, pastel ou vibrante.
+// - peças do catálogo já têm o campo familiaCor;
+// - fotos enviadas: descobrimos pela cor dominante (função familiaPorRgb, em regras.js);
+// - fotos de referência do Unsplash: olhamos o nome ("Tênis branco" = neutro).
+function getColorFamily(piece) {
+  if (piece.colorFamily) return piece.colorFamily;
+  const fromRgb = window.familiaPorRgb ? window.familiaPorRgb(piece.color) : null;
+  if (fromRgb) return fromRgb;
+  if (/preto|branco|bege|cinza|creme|nude|jeans/.test(`${piece.color || ""} ${piece.name || ""}`.toLowerCase())) return "neutro";
+  return null; // não sabemos: a cor não ajuda nem atrapalha
 }
 
-// Pontuação: quanto maior, melhor a peça combina com a peça escolhida.
+// Formalidade parecida = diferença de no máximo 1 ponto (escala de 1 a 5).
+function formalityIsClose(pieceA, pieceB) {
+  if (!pieceA.formality || !pieceB.formality) return false;
+  return Math.abs(pieceA.formality - pieceB.formality) <= 1;
+}
+
+// Ocasiões que as duas peças têm em comum (ex.: as duas servem para "passeio").
+function sharedOccasions(pieceA, pieceB) {
+  const occasionsB = pieceB.occasions || [];
+  return (pieceA.occasions || []).filter((occasion) => occasionsB.includes(occasion));
+}
+
+// Estação: calor e frio não combinam (ex.: moletom com short).
+// Exceção: blusa + casaco, porque dá para usar a camiseta por baixo do moletom.
+function seasonsMatch(pieceA, pieceB) {
+  const categories = [pieceA.category, pieceB.category];
+  if (categories.includes("tops") && categories.includes("outerwear")) return true;
+  return window.estacoesCombinam(pieceA.season, pieceB.season);
+}
+
+// ===== PONTUAÇÃO: quanto mais pontos, mais a peça combina com o look =====
+// Cada peça candidata começa com 0 pontos e ganha ou perde pontos assim:
+//   +1 para cada estilo em comum com a peça escolhida (ex.: as duas são "streetwear")
+//   +1 se a peça tem o estilo marcado em "Estilo desejado"
+//   +2 se a cor combina com TODAS as peças que já estão no look (tabela em regras.js)
+//   -3 se a cor "briga" com alguma peça do look
+//   +2 se a formalidade é parecida com a da peça escolhida (diferença de no máximo 1)
+//   +1 se as duas servem para pelo menos uma mesma ocasião (escola, passeio, festa...)
+//   +1 se a estação combina com todas as peças do look; -3 se não combina (ex.: moletom com short)
+//   -5 se for estampada e o look já tiver uma estampa
+// No final, sorteamos entre as peças com mais pontos.
 function scoreCandidate(candidate, base, look, wantedStyle) {
   let score = 0;
+
+  // Estilo
   const baseStyles = getPieceStyles(base);
-  score += getPieceStyles(candidate).filter((style) => baseStyles.includes(style)).length; // +1 por estilo em comum
-  if (getPieceStyles(candidate).includes(wantedStyle)) score += 1; // estilo escolhido na lista
-  if (isNeutral(candidate) || isNeutral(base)) score += 1;         // neutro combina com tudo
-  if (isPrinted(candidate) && look.some(isPrinted)) score -= 5;    // evita duas estampas no mesmo look
+  score += getPieceStyles(candidate).filter((style) => baseStyles.includes(style)).length;
+  if (getPieceStyles(candidate).includes(wantedStyle)) score += 1;
+
+  // Cor: comparamos com cada peça que já está no look
+  const candidateFamily = getColorFamily(candidate);
+  const colorsMatch = look.every((piece) => window.coresCombinam(candidateFamily, getColorFamily(piece)));
+  score += colorsMatch ? 2 : -3;
+
+  // Formalidade
+  if (formalityIsClose(candidate, base)) score += 2;
+
+  // Ocasião
+  if (sharedOccasions(candidate, base).length) score += 1;
+
+  // Estação
+  const seasonOk = look.every((piece) => seasonsMatch(candidate, piece));
+  score += seasonOk ? 1 : -3;
+
+  // Estampa: duas estampas no mesmo look ficam pesadas
+  if (isPrinted(candidate) && look.some(isPrinted)) score -= 5;
+
   return score;
+}
+
+// Uma peça "tem conflito" com o look quando:
+// a cor briga com alguma peça, a estação não combina, ou ela cria duas estampas.
+// Foto BOA = foto sem conflito.
+function hasConflict(candidate, look) {
+  const family = getColorFamily(candidate);
+  if (!look.every((piece) => window.coresCombinam(family, getColorFamily(piece)))) return true;
+  if (!look.every((piece) => seasonsMatch(candidate, piece))) return true;
+  if (isPrinted(candidate) && look.some(isPrinted)) return true;
+  return false;
 }
 
 // Escolhe, por sorteio, uma das peças mais bem pontuadas para a vaga.
 function pickBestPiece(slotName, base, look, wantedStyle, usedIds) {
   const slot = PIECE_SLOTS[slotName];
   const lookIds = look.map((piece) => piece.id);
-  const options = getAllPieces().filter((piece) => slot.categories.includes(piece.category) && !lookIds.includes(piece.id));
-  if (!options.length) return null;
+  const fits = (piece) => slot.categories.includes(piece.category) && !lookIds.includes(piece.id);
 
   // Peça que já apareceu em outra combinação perde 2 pontos (assim os 3 looks variam).
-  const scored = options.map((piece) => ({
+  const withScore = (piece) => ({
     piece,
     score: scoreCandidate(piece, base, look, wantedStyle) - (usedIds.includes(piece.id) ? 2 : 0)
-  }));
+  });
+
+  // 1º passo: só as FOTOS (catálogo + upload).
+  let scored = getAllPieces().filter(fits).map(withScore);
+  const hasGoodPhoto = scored.some((item) => !hasConflict(item.piece, look));
+
+  // 2º passo: se nenhuma foto serve sem conflito, as ilustrações entram — mas com 1 ponto a menos,
+  // para a foto real ganhar sempre que estiver empatada.
+  if (!hasGoodPhoto) {
+    const drawings = illustratedPieces.filter(fits).map(withScore).map((item) => ({ ...item, score: item.score - 1 }));
+    scored = [...scored, ...drawings];
+  }
+  if (!scored.length) return null;
+
   const bestScore = Math.max(...scored.map((item) => item.score));
   const finalists = scored.filter((item) => item.score >= bestScore - 1);
   return finalists[Math.floor(Math.random() * finalists.length)].piece;
 }
 
-// Uma frase explicando por que o look combina.
+// ===== FRASE "por que combina" =====
+// Olha o look pronto e junta até 3 motivos verdadeiros, por exemplo:
+// "Combina por: tons pastel com neutros + nível de formalidade parecido + todas servem para passeio."
 function explainLook(base, extras, wantedStyle) {
+  const all = [base, ...extras];
+  const reasons = [];
+
+  // 1. Cores: cada peça combina com todas as OUTRAS peças, pela tabela de regras.js?
+  const families = all.map(getColorFamily).filter(Boolean);
+  const colorsMatch = families.every((a, i) => families.every((b, j) => i === j || window.coresCombinam(a, b)));
+  if (colorsMatch && families.length) {
+    const plural = { quente: "quentes", frio: "frios", pastel: "pastel", vibrante: "vibrantes" };
+    const colorful = [...new Set(families.filter((family) => family !== "neutro"))].map((family) => plural[family]);
+    if (!colorful.length) reasons.push("tons neutros");
+    else reasons.push(`tons ${colorful.join(" e ")}${families.includes("neutro") ? " com neutros" : ""}`);
+  }
+
+  // 2. Formalidade: todas as peças têm nível parecido com a peça escolhida?
+  if (base.formality && extras.every((piece) => !piece.formality || formalityIsClose(piece, base))) {
+    reasons.push("nível de formalidade parecido");
+  }
+
+  // 3. Ocasião: existe uma ocasião que serve para todas as peças?
+  const withOccasions = all.filter((piece) => piece.occasions && piece.occasions.length);
+  if (withOccasions.length >= 2) {
+    const common = withOccasions.reduce((list, piece) => list.filter((occasion) => piece.occasions.includes(occasion)), withOccasions[0].occasions);
+    if (common.length) reasons.push(`todas servem para ${common[0]}`);
+  }
+
+  // 4. Estação: nenhuma peça de calor junto com peça de frio.
+  // (se tem casaco, a blusa vai por baixo, então não entra nessa conta)
+  const hasOuterwear = all.some((piece) => piece.category === "outerwear");
+  const seasons = all
+    .filter((piece) => !(hasOuterwear && piece.category === "tops"))
+    .map((piece) => piece.season)
+    .filter((season) => season && season !== "qualquer");
+  if (seasons.length && seasons.every((season) => season === seasons[0])) {
+    reasons.push(`peças para dias de ${seasons[0]}`);
+  }
+
+  // 5. Estilo em comum e estampa (motivos extras, se ainda couber).
+  const labels = { romantico: "romântico" };
   const baseStyles = getPieceStyles(base);
   const shared = [...new Set(extras.flatMap(getPieceStyles).filter((style) => baseStyles.includes(style)))];
-  const neutral = extras.find(isNeutral);
-  const printedCount = [base, ...extras].filter(isPrinted).length;
-  const reasons = [];
-  const labels = { romantico: "romântico" };
-  const sharedNames = shared.slice(0, 2).map((style) => labels[style] || style);
-  if (shared.length) reasons.push(`as peças têm o estilo ${sharedNames.join(" e ")} em comum`);
-  if (neutral) reasons.push(`${neutral.name.toLowerCase()} tem um tom neutro que combina com tudo`);
-  if (reasons.length < 2 && printedCount === 1) reasons.push("só uma peça é estampada, então o visual não fica pesado");
-  if (!reasons.length) reasons.push(`as cores se equilibram num look ${wantedStyle}`);
-  return `Combina porque ${reasons.slice(0, 2).join(" e ")}.`;
+  if (shared.length) reasons.push(`estilo ${labels[shared[0]] || shared[0]} em comum`);
+  if (all.filter(isPrinted).length === 1) reasons.push("só uma estampa");
+
+  if (!reasons.length) reasons.push(`cores equilibradas num look ${labels[wantedStyle] || wantedStyle}`);
+  return `Combina por: ${reasons.slice(0, 3).join(" + ")}.`;
 }
 
 let pieceMissingLabels = [];
@@ -1092,11 +1223,17 @@ function generatePieceLooks() {
     slots.forEach((slotName) => {
       if (slotName === "outerwear" && Math.random() < 0.5) return; // casaco opcional
       let chosen = pickBestPiece(slotName, base, pieces, wantedStyle, usedIds);
-      // Casaco é opcional: se for criar duas estampas, o look fica sem ele.
-      if (slotName === "outerwear" && chosen && isPrinted(chosen) && pieces.some(isPrinted)) return;
+      // Casaco é opcional: só entra se combinar bem (ex.: jaqueta de frio não vai com vestido de calor).
+      if (slotName === "outerwear" && chosen && hasConflict(chosen, pieces)) return;
+      const label = PIECE_SLOTS[slotName].label;
+      const hasPhoto = getAllPieces().some((piece) => PIECE_SLOTS[slotName].categories.includes(piece.category));
+      if (chosen && chosen.isIllustration && !hasPhoto) {
+        // Não existe nenhuma foto dessa vaga: avisa que usamos um desenho.
+        missing.add(`Ainda não tenho foto de ${label} no catálogo, então usei uma ilustração.`);
+      }
       if (!chosen && slotName !== "outerwear") {
-        // Falta essa categoria: avisa e usa uma foto de referência.
-        missing.add(PIECE_SLOTS[slotName].label);
+        // Nem foto nem ilustração: avisa e usa uma foto de referência da internet.
+        missing.add(`Ainda não tenho ${label} no catálogo, então usei uma foto de referência.`);
         chosen = getComplementaryReference(PIECE_SLOTS[slotName].reference, index, wantedStyle);
       }
       if (chosen) {
@@ -1144,7 +1281,8 @@ function renderPieceLooks() {
     const note = document.createElement("p");
     note.className = "piece-alternative-note";
     note.style.gridColumn = "1 / -1";
-    note.textContent = `Ainda não tenho ${label} no catálogo, então usei uma foto de referência.`;
+    // Histórico antigo guardava só a palavra ("bolsa"); o novo guarda a frase inteira.
+    note.textContent = label.startsWith("Ainda") ? label : `Ainda não tenho ${label} no catálogo, então usei uma foto de referência.`;
     pieceLookGrid.appendChild(note);
   });
 
@@ -1154,7 +1292,7 @@ function renderPieceLooks() {
     const isFavorite = savedLooks.some((saved) => saved.id === look.id);
 
     // Fotos lado a lado: uma coluna para cada peça do look.
-    card.innerHTML = `<div class="piece-look-preview" style="grid-template-columns: repeat(${look.pieces.length}, 1fr)">${look.pieces.map((piece) => `<img src="${piece.image}" alt="${piece.name}">`).join("")}</div>
+    card.innerHTML = `<div class="piece-look-preview" style="grid-template-columns: repeat(${look.pieces.length}, 1fr)">${look.pieces.map((piece) => `<img src="${piece.image}" alt="${piece.name}" style="${illustrationStyle(piece)}">`).join("")}</div>
       <div class="piece-look-body">
         <div class="piece-look-heading"><div><p class="section-kicker">Com sua peça</p><h4>${look.name}</h4></div><button class="favorite-look ${isFavorite ? "active" : ""}" type="button" aria-label="Favoritar combinação">${isFavorite ? "♥" : "♡"}</button></div>
         <div class="piece-tags"><span>${look.style}</span><span>${look.occasion}</span></div>
@@ -1242,7 +1380,7 @@ function renderPieceHistory() {
     card.className = "piece-look-card";
     card.innerHTML = `<div class="piece-look-body"><p class="section-kicker">${new Date(entry.createdAt).toLocaleDateString("pt-BR")}</p><h4>${entry.baseName}</h4><p>${entry.looks.length} combinações geradas</p><button class="new-looks-button piece-history-reopen" type="button">Ver combinações</button></div>`;
     card.querySelector(".piece-history-reopen").addEventListener("click", () => {
-      const base = getAllPieces().find((piece) => piece.id === entry.baseId);
+      const base = findPieceById(entry.baseId);
       if (base) selectBasePiece(base.id);
       pieceGeneratedLooks = entry.looks;
       pieceMissingLabels = entry.missing || [];
