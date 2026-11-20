@@ -88,7 +88,7 @@ button { font: inherit; cursor: pointer; }
 .quiz-progress-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; font-size: .78rem; }
 .quiz-progress { margin-bottom: 18px; overflow: hidden; border-radius: 999px; }
 .quiz-progress-fill { height: 100%; border-radius: inherit; transition: width .35s ease; }
-.quiz-options { display: grid; max-width: 640px; margin: 0 auto; }
+.quiz-options { display: grid; max-width: 700px; margin: 0 auto; }
 .quiz-option { width: 100%; font-size: .95rem; }
 .quiz-restart-button { padding: 12px 22px; border: 0; color: #fff; font-weight: 700; }
 
@@ -305,14 +305,13 @@ button { font: inherit; cursor: pointer; }
   background: white;
   transition: transform .35s cubic-bezier(.2,.8,.2,1), border-color .25s, background .25s;
 }
-.quiz-option:hover { border-color: rgba(255,30,138,.28); background: #fff8fc; }
+.quiz-option:hover { border-color: rgba(255,30,138,.28); background: #fff0f7; } /* rosa claro, o mesmo dos filtros ativos */
 
 /* Quiz editorial moderno */
 .quiz-progress-row {
   color: #73738a;
   font-family: "Inter", sans-serif;
   letter-spacing: .02em;
-  text-transform: uppercase;
 }
 
 .quiz-question-card {
@@ -327,8 +326,9 @@ button { font: inherit; cursor: pointer; }
 }
 
 .quiz-question-card h3 {
-  max-width: 560px;
+  max-width: 700px; /* mesma largura das opções, para pergunta e respostas ficarem alinhadas */
   margin: 0 auto 22px;
+  text-align: left;
   font-family: "Outfit", sans-serif;
   font-size: clamp(1.35rem, 3vw, 1.75rem);
   letter-spacing: -.035em;
@@ -654,3 +654,24 @@ button { font: inherit; cursor: pointer; }
 .wardrobe-category-edit { width: 100%; border: 1px solid rgba(26,26,46,.08); border-radius: 8px; color: var(--text); background: white; font-family: inherit; }
 .wardrobe-name-edit { height: 32px; margin-bottom: 5px; padding: 0 8px; font-size: .74rem; font-weight: 700; }
 .wardrobe-category-edit { height: 30px; margin-top: 5px; padding: 0 6px; font-size: .68rem; }
+
+/* ===== Ajustes de celular do Quiz e do Dossiê =====
+   Ficam no fim do arquivo para valer por cima das regras de tema acima. */
+@media (max-width: 520px) {
+  .quiz-question-card { min-height: 0; padding: 18px; }
+  .vibe-result { padding: 16px; }
+  .style-dossier-grid { grid-template-columns: 1fr; } /* 4 cartões um embaixo do outro, sem texto espremido */
+  .dossier-card { min-height: 0; }
+}
+
+/* Foco do teclado/JS: contorno rosa discreto em vez do preto padrão do navegador */
+.back-button:focus-visible,
+.play-button:focus-visible,
+.quiz-option:focus-visible { outline: 2px solid rgba(255,30,138,.45); outline-offset: 3px; }
+
+/* Botões "Ver outras combinações / mais elegante / mais casual" (a classe não tinha CSS) */
+.piece-look-option-buttons { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 6px; }
+@media (max-width: 520px) {
+  .piece-look-toolbar { flex-direction: column; align-items: flex-start; }
+  .piece-look-option-buttons { justify-content: flex-start; }
+}

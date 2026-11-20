@@ -222,7 +222,7 @@ function renderQuizQuestion() {
   const current = quizQuestions[quizQuestionIndex];
   const progress = Math.round(((quizQuestionIndex + 1) / quizQuestions.length) * 100);
 
-  quizStepLabel.textContent = `Pergunta ${String(quizQuestionIndex + 1).padStart(2, "0")} / ${quizQuestions.length}`;
+  quizStepLabel.textContent = `Pergunta ${quizQuestionIndex + 1} de ${quizQuestions.length}`;
   quizProgressText.textContent = `${progress}%`;
   quizProgressFill.style.width = `${progress}%`;
   quizProgress.setAttribute("aria-valuenow", progress);
