@@ -8,17 +8,10 @@ const starCounter = document.querySelector(".star-counter");
 const soundButton = document.getElementById("soundButton");
 
 const gameSymbols = {
-  "Jogo da Memória Kawaii": "🌸",
   "Quiz: Qual é a sua Vibe?": "✨",
-  "Estúdio de Moda (Dress Up)": "👗",
   "Organizador de Looks": "🧥"
 };
 
-const memoryGame = document.getElementById("memoryGame");
-const memoryBoard = document.getElementById("memoryBoard");
-const attemptCount = document.getElementById("attemptCount");
-const resetButton = document.getElementById("resetButton");
-const victoryMessage = document.getElementById("victoryMessage");
 const gameMessage = document.getElementById("gameMessage");
 
 const vibeQuiz = document.getElementById("vibeQuiz");
@@ -35,40 +28,8 @@ const vibeResultTitle = document.getElementById("vibeResultTitle");
 const vibeResultDescription = document.getElementById("vibeResultDescription");
 const quizRestartButton = document.getElementById("quizRestartButton");
 
-const dressupGame = document.getElementById("dressupGame");
-const dressupStage = document.getElementById("dressupStage");
-const hairBack = document.getElementById("hairBack");
-const hairTop = document.getElementById("hairTop");
-const hairLeft = document.getElementById("hairLeft");
-const hairRight = document.getElementById("hairRight");
-const dressModel = document.getElementById("dressModel");
-const dressDetails = document.getElementById("dressDetails");
-const accessoryCrown = document.getElementById("accessoryCrown");
-const accessoryBow = document.getElementById("accessoryBow");
-const accessoryGlasses = document.getElementById("accessoryGlasses");
-const randomLookButton = document.getElementById("randomLookButton");
-const saveLookButton = document.getElementById("saveLookButton");
-const savedLookMessage = document.getElementById("savedLookMessage");
-
 const outfitOrganizer = document.getElementById("outfitOrganizer");
-const outfitItemsContainer = document.getElementById("outfitItemsContainer");
-const addItemButton = document.getElementById("addItemButton");
-const removeItemButton = document.getElementById("removeItemButton");
-const itemNameInput = document.getElementById("itemNameInput");
-const itemColorInput = document.getElementById("itemColorInput");
-const itemTypeSelect = document.getElementById("itemTypeSelect");
-const saveOutfitButton = document.getElementById("saveOutfitButton");
-const clearOutfitButton = document.getElementById("clearOutfitButton");
-const outfitNameInput = document.getElementById("outfitNameInput");
-const outfitList = document.getElementById("outfitList");
 
-const kawaiiEmojis = ["🎀", "🦄", "🍓", "🌸", "👑", "🧁", "💖", "✨"];
-let firstCard = null;
-let secondCard = null;
-let boardLocked = false;
-let movements = 0;
-let matchedPairs = 0;
-let mismatchTimeout = null;
 let stars = 0;
 let soundEnabled = false;
 let audioContext = null;
@@ -83,142 +44,19 @@ try {
 
 starCount.textContent = stars;
 
-function shuffle(items) {
-  const shuffled = [...items];
-  for (let index = shuffled.length - 1; index > 0; index -= 1) {
-    const randomIndex = Math.floor(Math.random() * (index + 1));
-    [shuffled[index], shuffled[randomIndex]] = [shuffled[randomIndex], shuffled[index]];
-  }
-  return shuffled;
-}
-
-function resetTurn() {
-  firstCard = null;
-  secondCard = null;
-  boardLocked = false;
-}
-
-function updateAttempts() {
-  movements += 1;
-  attemptCount.textContent = movements;
-}
-
-function showVictory() {
-  victoryMessage.innerHTML = `🎉 Parabéns, estrela! Você encontrou todos os pares em <strong>${movements}</strong> tentativas! 💖`;
-  victoryMessage.hidden = false;
-  addStars(10);
-}
-
-function checkForMatch() {
-  const isMatch = firstCard.dataset.emoji === secondCard.dataset.emoji;
-
-  if (isMatch) {
-    firstCard.classList.add("matched");
-    secondCard.classList.add("matched");
-    firstCard.disabled = true;
-    secondCard.disabled = true;
-    matchedPairs += 1;
-    resetTurn();
-
-    if (matchedPairs === kawaiiEmojis.length) {
-      showVictory();
-    }
-    return;
-  }
-
-  boardLocked = true;
-  mismatchTimeout = window.setTimeout(() => {
-    firstCard.classList.remove("flipped");
-    secondCard.classList.remove("flipped");
-    resetTurn();
-  }, 850);
-}
-
-function handleCardSelection(card) {
-  if (boardLocked || card === firstCard || card.classList.contains("matched")) return;
-
-  card.classList.add("flipped");
-
-  if (!firstCard) {
-    firstCard = card;
-    return;
-  }
-
-  secondCard = card;
-  updateAttempts();
-  checkForMatch();
-}
-
-function createMemoryBoard() {
-  memoryBoard.innerHTML = "";
-  victoryMessage.hidden = true;
-  firstCard = null;
-  secondCard = null;
-  boardLocked = false;
-  movements = 0;
-  matchedPairs = 0;
-  attemptCount.textContent = "0";
-
-  const cards = shuffle([...kawaiiEmojis, ...kawaiiEmojis]);
-
-  cards.forEach((emoji) => {
-    const card = document.createElement("button");
-    card.type = "button";
-    card.className = "memory-card";
-    card.dataset.emoji = emoji;
-    card.setAttribute("aria-label", "Carta fechada");
-    card.innerHTML = `
-      <span class="memory-card-inner">
-        <span class="card-face card-back" aria-hidden="true"></span>
-        <span class="card-face card-front" aria-hidden="true">${emoji}</span>
-      </span>
-    `;
-
-    card.addEventListener("click", () => {
-      handleCardSelection(card);
-      card.setAttribute("aria-label", card.classList.contains("flipped") ? `Carta ${emoji}` : "Carta fechada");
-    });
-
-    memoryBoard.appendChild(card);
-  });
-}
-
-function resetDressup() {
-  ["hair", "dress", "accessory", "background"].forEach((category) => {
-    const firstButton = document.querySelector(`.style-options[data-category="${category}"] .style-option`);
-    if (firstButton) {
-      markActiveOption(firstButton);
-      applyDressupOption(category, firstButton.dataset.value);
-    }
-  });
-  savedLookMessage.hidden = true;
-}
-
 function openSelectedGame(selectedGame) {
   gameTitle.textContent = selectedGame;
   gameSymbol.textContent = gameSymbols[selectedGame] || "✨";
 
-  const isMemoryGame = selectedGame === "Jogo da Memória Kawaii";
   const isVibeQuiz = selectedGame === "Quiz: Qual é a sua Vibe?";
-  const isDressup = selectedGame === "Estúdio de Moda (Dress Up)";
   const isLookOrganizer = selectedGame === "Organizador de Looks";
-  memoryGame.hidden = !isMemoryGame;
   vibeQuiz.hidden = !isVibeQuiz;
-  dressupGame.hidden = !isDressup;
   outfitOrganizer.hidden = !isLookOrganizer;
 
-  if (isMemoryGame) {
-    gameSymbol.hidden = true;
-    gameMessage.hidden = true;
-    createMemoryBoard();
-  } else if (isVibeQuiz) {
+  if (isVibeQuiz) {
     gameSymbol.hidden = true;
     gameMessage.hidden = true;
     resetQuiz();
-  } else if (isDressup) {
-    gameSymbol.hidden = true;
-    gameMessage.hidden = true;
-    resetDressup();
   } else if (isLookOrganizer) {
     gameSymbol.hidden = true;
     gameMessage.hidden = true;
@@ -244,19 +82,16 @@ document.querySelectorAll(".play-button").forEach((button) => {
 backButton.addEventListener("click", () => {
   gameView.hidden = true;
   menuView.hidden = false;
-  memoryGame.hidden = true;
   vibeQuiz.hidden = true;
-  dressupGame.hidden = true;
   outfitOrganizer.hidden = true;
+  switchOrganizerView("wardrobe"); // esconde também a tela "Combinar uma peça"
   resetQuiz();
-  resetDressup();
   window.scrollTo({ top: 0, behavior: "smooth" });
 
   const firstPlayButton = document.querySelector(".play-button");
   if (firstPlayButton) firstPlayButton.focus();
 });
 
-resetButton.addEventListener("click", createMemoryBoard);
 quizRestartButton.addEventListener("click", resetQuiz);
 
 const quizQuestions = [
@@ -445,114 +280,6 @@ function showVibeResult() {
   addStars(10);
 }
 
-const hairColors = {
-  chocolate: "#5a385d",
-  pink: "#d95e98",
-  lilac: "#9a78c7",
-  gold: "#d5a64d"
-};
-
-const dressColors = {
-  pink: { main: "#ef70a4", light: "#ff9fc2", border: "#b94f82" },
-  lilac: { main: "#9b82d1", light: "#c3b2ec", border: "#735ba7" },
-  blue: { main: "#63b8d8", light: "#9cd8e9", border: "#438da9" },
-  gold: { main: "#ddb85d", light: "#f2d38a", border: "#ad8938" }
-};
-
-function setHairColor(value) {
-  const color = hairColors[value] || hairColors.chocolate;
-  [hairBack, hairTop, hairLeft, hairRight].forEach((part) => {
-    if (part) part.setAttribute("fill", color);
-  });
-}
-
-function setDressColor(value) {
-  const colors = dressColors[value] || dressColors.pink;
-  const dressPaths = dressModel.querySelectorAll("path");
-  if (dressPaths[0]) {
-    dressPaths[0].setAttribute("fill", colors.main);
-    dressPaths[0].setAttribute("stroke", colors.border);
-  }
-  if (dressPaths[1]) dressPaths[1].setAttribute("fill", colors.light);
-
-  const details = dressDetails.querySelectorAll("path");
-  if (details[0]) details[0].setAttribute("stroke", value === "gold" ? "#fff2b5" : "#ffd66b");
-}
-
-function setAccessory(value) {
-  const accessories = [accessoryCrown, accessoryBow, accessoryGlasses];
-  accessories.forEach((item) => {
-    if (item) {
-      item.style.display = "none";
-      item.setAttribute("hidden", "");
-    }
-  });
-
-  const selected = value === "crown" ? accessoryCrown : value === "bow" ? accessoryBow : value === "glasses" ? accessoryGlasses : null;
-  if (selected) {
-    selected.removeAttribute("hidden");
-    selected.style.display = "block";
-  }
-}
-
-function setBackground(value) {
-  dressupStage.dataset.background = value;
-}
-
-function getRandomOption(category) {
-  const buttons = [...document.querySelectorAll(`.style-options[data-category="${category}"] .style-option`)];
-  return buttons[Math.floor(Math.random() * buttons.length)].dataset.value;
-}
-
-function applyDressupOption(category, value) {
-  if (category === "hair") setHairColor(value);
-  if (category === "dress") setDressColor(value);
-  if (category === "accessory") setAccessory(value);
-  if (category === "background") setBackground(value);
-}
-
-function markActiveOption(button) {
-  const siblings = button.parentElement.querySelectorAll(".style-option");
-  siblings.forEach((sibling) => sibling.classList.remove("active"));
-  button.classList.add("active");
-}
-
-function activateRandomCategory(category, value) {
-  const button = document.querySelector(`.style-options[data-category="${category}"] .style-option[data-value="${value}"]`);
-  if (button) {
-    markActiveOption(button);
-    applyDressupOption(category, value);
-  }
-}
-
-function createConfetti() {
-  const colors = ["#ff69a7", "#ffd66b", "#b48be5", "#ffffff", "#63b8d8"];
-  for (let index = 0; index < 38; index += 1) {
-    const piece = document.createElement("span");
-    piece.className = "confetti-piece";
-    piece.style.left = `${Math.random() * 100}%`;
-    piece.style.top = `${-20 - Math.random() * 120}px`;
-    piece.style.background = colors[index % colors.length];
-    piece.style.animationDelay = `${Math.random() * .45}s`;
-    piece.style.transform = `rotate(${Math.random() * 180}deg)`;
-    document.body.appendChild(piece);
-    window.setTimeout(() => piece.remove(), 2300);
-  }
-}
-
-randomLookButton.addEventListener("click", () => {
-  ["hair", "dress", "accessory", "background"].forEach((category) => {
-    activateRandomCategory(category, getRandomOption(category));
-  });
-  savedLookMessage.hidden = true;
-});
-
-saveLookButton.addEventListener("click", () => {
-  savedLookMessage.hidden = false;
-  createConfetti();
-  addStars(10);
-});
-
 function updateSoundButton() {
   soundButton.setAttribute("aria-pressed", String(soundEnabled));
   soundButton.setAttribute("aria-label", soundEnabled ? "Mutar som" : "Ativar som");
@@ -623,81 +350,12 @@ document.querySelectorAll(".play-button").forEach((button) => {
 });
 
 backButton.addEventListener("click", () => playSparkleSound());
-resetButton.addEventListener("click", () => playSparkleSound());
 quizRestartButton.addEventListener("click", () => playSparkleSound());
-randomLookButton.addEventListener("click", () => playSparkleSound());
 
 const dossierPieces = document.getElementById("dossierPieces");
 const dossierHair = document.getElementById("dossierHair");
 const dossierNails = document.getElementById("dossierNails");
 const dossierEssence = document.getElementById("dossierEssence");
-
-const outfitItems = [];
-let outfitIdCounter = 0;
-
-function updateOutfitList() {
-  if (outfitList) outfitList.innerHTML = "";
-  outfitItems.forEach((item) => {
-    if (!outfitList) return;
-    const listItem = document.createElement("li");
-    listItem.textContent = item.name;
-    outfitList.appendChild(listItem);
-  });
-}
-
-function addItemToOutfit() {
-  if (!itemNameInput || !itemColorInput || !itemTypeSelect) return;
-  const name = itemNameInput.value.trim();
-  const color = itemColorInput.value.trim();
-  const type = itemTypeSelect.value;
-
-  if (!name || !color) {
-    alert("Por favor, preencha todos os campos.");
-    return;
-  }
-
-  outfitItems.push({ id: outfitIdCounter++, name, color, type });
-  updateOutfitList();
-  itemNameInput.value = "";
-  itemColorInput.value = "";
-}
-
-function removeItemFromOutfit() {
-  if (!itemNameInput) return;
-  const name = itemNameInput.value.trim();
-  const itemIndex = outfitItems.findIndex((item) => item.name === name);
-  if (itemIndex !== -1) outfitItems.splice(itemIndex, 1);
-  else alert("Item não encontrado no seu guarda-roupa.");
-  updateOutfitList();
-  itemNameInput.value = "";
-}
-
-function saveOutfit() {
-  if (!outfitNameInput) return;
-  const outfitName = outfitNameInput.value.trim();
-  if (!outfitName || outfitItems.length === 0) {
-    alert("Por favor, dê um nome ao seu conjunto e adicione itens.");
-    return;
-  }
-  const savedOutfits = JSON.parse(localStorage.getItem("pinkSparkleOutfits") || "[]");
-  savedOutfits.push({ name: outfitName, items: outfitItems });
-  localStorage.setItem("pinkSparkleOutfits", JSON.stringify(savedOutfits));
-  outfitNameInput.value = "";
-  outfitItems.length = 0;
-  updateOutfitList();
-  alert("Conjunto salvo com sucesso!");
-}
-
-function clearOutfit() {
-  outfitItems.length = 0;
-  updateOutfitList();
-  alert("Guarda-roupa limpo!");
-}
-
-if (addItemButton) addItemButton.addEventListener("click", addItemToOutfit);
-if (removeItemButton) removeItemButton.addEventListener("click", removeItemFromOutfit);
-if (saveOutfitButton) saveOutfitButton.addEventListener("click", saveOutfit);
-if (clearOutfitButton) clearOutfitButton.addEventListener("click", clearOutfit);
 
 // Configuração opcional da API de visão: defina este endpoint em produção.
 // Esperado: POST multipart/form-data com campo "images" e JSON opcional "preferences".
@@ -821,12 +479,34 @@ function readDominantColor(imageDataUrl) {
   });
 }
 
+// Lê a foto enviada e já devolve a versão reduzida (é ela que vai para o localStorage).
 function fileToDataUrl(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
-    reader.onload = () => resolve(reader.result);
+    reader.onload = () => resizeImage(reader.result).then(resolve, reject);
     reader.onerror = () => reject(new Error("Não foi possível ler esta imagem."));
     reader.readAsDataURL(file);
+  });
+}
+
+// Reduz a foto para no máximo 800px no lado maior e salva como JPEG qualidade 0.7,
+// para o closet não estourar o limite do localStorage (uns 5 MB).
+function resizeImage(dataUrl, maxSize = 800, quality = 0.7) {
+  return new Promise((resolve, reject) => {
+    const image = new Image();
+    image.onload = () => {
+      const scale = Math.min(1, maxSize / Math.max(image.width, image.height));
+      const canvas = document.createElement("canvas");
+      canvas.width = Math.round(image.width * scale);
+      canvas.height = Math.round(image.height * scale);
+      const context = canvas.getContext("2d");
+      context.fillStyle = "#ffffff"; // fundo branco para PNG/WEBP com transparência
+      context.fillRect(0, 0, canvas.width, canvas.height);
+      context.drawImage(image, 0, 0, canvas.width, canvas.height);
+      resolve(canvas.toDataURL("image/jpeg", quality));
+    };
+    image.onerror = () => reject(new Error("Não foi possível ler esta imagem."));
+    image.src = dataUrl;
   });
 }
 
@@ -1179,6 +859,25 @@ try {
   pieceHistory = [];
 }
 
+// Peças do catalogo.js no mesmo formato das peças enviadas pelo upload.
+const catalogPieces = (window.CATALOGO_PECAS || []).map((peca) => ({
+  id: `catalogo-${peca.id}`,
+  name: peca.nome,
+  category: peca.categoria,
+  color: peca.cor,
+  colorHex: peca.corHex,
+  print: peca.estampada ? "estampada" : "liso ou neutro",
+  style: peca.estilos.join(", "),
+  styles: peca.estilos,
+  image: peca.arquivo,
+  fromCatalog: true
+}));
+
+// Catálogo + peças que a pessoa enviou.
+function getAllPieces() {
+  return [...catalogPieces, ...wardrobePieces];
+}
+
 function persistPieceHistory() {
   try { localStorage.setItem("pinkSparklePieceHistory", JSON.stringify(pieceHistory)); }
   catch (error) { showUploadError("Não foi possível salvar o histórico neste navegador."); }
@@ -1187,11 +886,11 @@ function persistPieceHistory() {
 function renderPiecePicker() {
   if (!pieceMatchPicker) return;
   const pieces = pieceFilterCategory === "all"
-    ? wardrobePieces
-    : wardrobePieces.filter((piece) => piece.category === pieceFilterCategory);
+    ? getAllPieces()
+    : getAllPieces().filter((piece) => piece.category === pieceFilterCategory);
 
   if (!pieces.length) {
-    pieceMatchPicker.innerHTML = '<p class="piece-alternative-note">Nenhuma peça desta categoria no guarda-roupa. Use “Adicionar peça”.</p>';
+    pieceMatchPicker.innerHTML = '<p class="piece-alternative-note">Ainda não tenho peças desta categoria no catálogo. Use “Adicionar peça”.</p>';
     return;
   }
 
@@ -1207,8 +906,7 @@ function renderPiecePicker() {
 }
 
 function selectBasePiece(pieceId) {
-  selectedBasePiece = wardrobePieces.find((piece) => piece.id === pieceId) || null;
-  pieceGenerateButton.disabled = !selectedBasePiece;
+  selectedBasePiece = getAllPieces().find((piece) => piece.id === pieceId) || null;
   pieceLookResults.hidden = true;
 
   if (!selectedBasePiece) {
@@ -1275,114 +973,163 @@ if (pieceMatchUpload) {
   });
 }
 
-function pieceCanComplement(base, candidate) {
-  if (!candidate || candidate.id === base.id) return false;
-  if (candidate.category === base.category) return false;
-  if (["tops", "bottoms", "skirts", "dresses", "outerwear", "shoes", "accessories"].includes(candidate.category)) return true;
+// ===== Combinar uma peça: regras simples, sem IA =====
+
+// "Vagas" que completam um look. reference = categoria das fotos do Unsplash usada se faltar peça.
+const PIECE_SLOTS = {
+  top: { label: "blusa", categories: ["tops"], reference: "tops" },
+  bottom: { label: "parte de baixo", categories: ["pants", "shorts", "skirts"], reference: "pants" },
+  shoe: { label: "sapato", categories: ["sneakers_shoes", "sandals", "shoes"], reference: "shoes" },
+  bag: { label: "bolsa", categories: ["bags", "accessories"], reference: "accessories" },
+  outerwear: { label: "casaco", categories: ["outerwear"], reference: null }
+};
+
+// Quais vagas preencher, de acordo com a categoria da peça escolhida.
+function getSlotsForPiece(category) {
+  if (category === "tops") return ["bottom", "shoe", "bag"];
+  if (["pants", "shorts", "skirts"].includes(category)) return ["top", "shoe", "bag"];
+  if (["dresses", "sets"].includes(category)) return ["shoe", "bag", "outerwear"]; // casaco é opcional
+  if (["sneakers_shoes", "sandals"].includes(category)) return ["top", "bottom", "bag"];
+  return ["top", "bottom", "shoe"]; // bolsa, acessório, casaco ou peça não identificada
+}
+
+// Alguns estilos da lista não existem no catálogo; usamos o mais parecido.
+const STYLE_ALIASES = { clean: "minimalista", pinterest: "patricinha", aesthetic: "romantico", sofisticado: "elegante" };
+
+function getWantedStyle() {
+  const value = document.getElementById("pieceStylePreference").value;
+  return STYLE_ALIASES[value] || value;
+}
+
+function getPieceStyles(piece) {
+  return Array.isArray(piece.styles) ? piece.styles : [];
+}
+
+function isPrinted(piece) {
+  return Boolean(piece.print) && piece.print !== "liso ou neutro";
+}
+
+// Neutros (preto, branco, bege, cinza, jeans...) combinam com tudo.
+function isNeutral(piece) {
+  const text = `${piece.color || ""} ${piece.name || ""}`.toLowerCase();
+  if (/preto|branco|bege|cinza|creme|nude|jeans/.test(text)) return true;
+  // Peças do upload guardam a cor como "rgb(r,g,b)": cor sem saturação = neutra.
+  const rgb = String(piece.color || "").match(/\d+/g);
+  if (rgb && rgb.length >= 3) {
+    const [r, g, b] = rgb.map(Number);
+    return Math.max(r, g, b) - Math.min(r, g, b) < 40;
+  }
   return false;
 }
 
-function getPieceAlternatives(category, baseId, lookIndex, excludedIds = []) {
-  const options = wardrobePieces.filter((piece) => {
-    if (piece.id === baseId || excludedIds.includes(piece.id)) return false;
-    if (category === "bottoms") return ["pants", "bottoms", "skirts", "shorts"].includes(piece.category);
-    if (category === "shoes") return ["shoes", "sneakers_shoes", "sandals"].includes(piece.category);
-    if (category === "tops") return ["tops"].includes(piece.category);
-    if (category === "skirts") return piece.category === "skirts";
-    if (category === "pants") return ["pants", "bottoms"].includes(piece.category);
-    if (category === "shorts") return piece.category === "shorts";
-    if (category === "accessories") return ["accessories", "bags"].includes(piece.category);
-    return piece.category === category;
-  });
+// Pontuação: quanto maior, melhor a peça combina com a peça escolhida.
+function scoreCandidate(candidate, base, look, wantedStyle) {
+  let score = 0;
+  const baseStyles = getPieceStyles(base);
+  score += getPieceStyles(candidate).filter((style) => baseStyles.includes(style)).length; // +1 por estilo em comum
+  if (getPieceStyles(candidate).includes(wantedStyle)) score += 1; // estilo escolhido na lista
+  if (isNeutral(candidate) || isNeutral(base)) score += 1;         // neutro combina com tudo
+  if (isPrinted(candidate) && look.some(isPrinted)) score -= 5;    // evita duas estampas no mesmo look
+  return score;
+}
+
+// Escolhe, por sorteio, uma das peças mais bem pontuadas para a vaga.
+function pickBestPiece(slotName, base, look, wantedStyle, usedIds) {
+  const slot = PIECE_SLOTS[slotName];
+  const lookIds = look.map((piece) => piece.id);
+  const options = getAllPieces().filter((piece) => slot.categories.includes(piece.category) && !lookIds.includes(piece.id));
   if (!options.length) return null;
-  return options[(lookIndex + pieceHistory.length) % options.length];
+
+  // Peça que já apareceu em outra combinação perde 2 pontos (assim os 3 looks variam).
+  const scored = options.map((piece) => ({
+    piece,
+    score: scoreCandidate(piece, base, look, wantedStyle) - (usedIds.includes(piece.id) ? 2 : 0)
+  }));
+  const bestScore = Math.max(...scored.map((item) => item.score));
+  const finalists = scored.filter((item) => item.score >= bestScore - 1);
+  return finalists[Math.floor(Math.random() * finalists.length)].piece;
 }
 
-function findComplement(category, baseId, offset, excludedIds, style) {
-  const wardrobePiece = getPieceAlternatives(category, baseId, offset, excludedIds);
-  if (wardrobePiece) return wardrobePiece;
-  if (category === "bottoms" || category === "pants") return getComplementaryReference("pants", offset, style);
-  if (category === "skirts") return getComplementaryReference("skirts", offset, style);
-  if (category === "shorts") return getComplementaryReference("shorts", offset, style);
-  if (category === "tops") return getComplementaryReference("tops", offset, style);
-  if (category === "shoes") return getComplementaryReference("shoes", offset, style);
-  if (category === "accessories") return getComplementaryReference("accessories", offset, style);
-  return null;
+// Uma frase explicando por que o look combina.
+function explainLook(base, extras, wantedStyle) {
+  const baseStyles = getPieceStyles(base);
+  const shared = [...new Set(extras.flatMap(getPieceStyles).filter((style) => baseStyles.includes(style)))];
+  const neutral = extras.find(isNeutral);
+  const printedCount = [base, ...extras].filter(isPrinted).length;
+  const reasons = [];
+  const labels = { romantico: "romântico" };
+  const sharedNames = shared.slice(0, 2).map((style) => labels[style] || style);
+  if (shared.length) reasons.push(`as peças têm o estilo ${sharedNames.join(" e ")} em comum`);
+  if (neutral) reasons.push(`${neutral.name.toLowerCase()} tem um tom neutro que combina com tudo`);
+  if (reasons.length < 2 && printedCount === 1) reasons.push("só uma peça é estampada, então o visual não fica pesado");
+  if (!reasons.length) reasons.push(`as cores se equilibram num look ${wantedStyle}`);
+  return `Combina porque ${reasons.slice(0, 2).join(" e ")}.`;
 }
 
-function generatePieceLooks(more = false) {
+let pieceMissingLabels = [];
+
+function showPieceMessage(icon, title, text) {
+  pieceLookResults.hidden = false;
+  pieceLookGrid.innerHTML = `<div class="saved-empty"><span>${icon}</span><h3>${title}</h3><p>${text}</p></div>`;
+}
+
+function generatePieceLooks() {
   if (!selectedBasePiece) {
-    showUploadError("Selecione uma peça principal primeiro.");
+    showPieceMessage("💖", "Escolha uma peça primeiro 💖", "Toque em uma peça da lista e depois em “Encontrar combinações”.");
     return;
   }
 
-  const style = document.getElementById("pieceStylePreference").value;
-  const occasion = document.getElementById("pieceOccasionPreference").value;
   const base = selectedBasePiece;
-  const candidates = wardrobePieces.filter((piece) => pieceCanComplement(base, piece));
-
-  if (candidates.length === 0) {
-    pieceLookResults.hidden = false;
-    pieceLookGrid.innerHTML = '<div class="saved-empty"><span>＋</span><h3>Vamos completar seu guarda-roupa</h3><p>Adicione outras roupas, calçados ou acessórios para combinar com esta peça.</p></div>';
-    return;
-  }
-
+  const wantedStyle = getWantedStyle();
+  const occasion = document.getElementById("pieceOccasionPreference").value;
+  const slots = getSlotsForPiece(base.category);
+  const usedIds = [];
+  const missing = new Set();
   const looks = [];
-  const neededCategories = base.category === "tops" || base.category === "bottoms" || base.category === "skirts" || base.category === "dresses"
-    ? ["tops", "bottoms", "skirts", "dresses", "outerwear", "shoes", "accessories"]
-    : ["tops", "bottoms", "skirts", "dresses", "outerwear", "shoes", "accessories"];
 
-  for (let index = 0; index < 4; index += 1) {
-    const offset = more ? index + pieceHistory.length : index;
+  for (let index = 0; index < 3; index += 1) {
     const pieces = [base];
+    slots.forEach((slotName) => {
+      if (slotName === "outerwear" && Math.random() < 0.5) return; // casaco opcional
+      let chosen = pickBestPiece(slotName, base, pieces, wantedStyle, usedIds);
+      // Casaco é opcional: se for criar duas estampas, o look fica sem ele.
+      if (slotName === "outerwear" && chosen && isPrinted(chosen) && pieces.some(isPrinted)) return;
+      if (!chosen && slotName !== "outerwear") {
+        // Falta essa categoria: avisa e usa uma foto de referência.
+        missing.add(PIECE_SLOTS[slotName].label);
+        chosen = getComplementaryReference(PIECE_SLOTS[slotName].reference, index, wantedStyle);
+      }
+      if (chosen) {
+        pieces.push(chosen);
+        usedIds.push(chosen.id);
+      }
+    });
 
-    const pushAlternative = (category) => {
-      const chosen = findComplement(category, base.id, offset, pieces.filter(Boolean).map((item) => item.id), style);
-      if (chosen) pieces.push(chosen);
-    };
-
-    if (base.category === "tops") {
-      pushAlternative("bottoms");
-      if (pieces.length === 1) pushAlternative("skirts");
-    } else if (base.category === "bottoms" || base.category === "skirts") {
-      pushAlternative("tops");
-    } else if (base.category === "dresses") {
-      pushAlternative("outerwear");
-    } else if (["shoes", "outerwear", "accessories"].includes(base.category)) {
-      pushAlternative("tops");
-      pushAlternative("bottoms");
-    } else {
-      pushAlternative("tops");
-      pushAlternative("bottoms");
-    }
-
-    pushAlternative("shoes");
-    pushAlternative("accessories");
-
-    const unique = [...new Map(pieces.filter(Boolean).map((piece) => [piece.id, piece])).values()];
-    if (unique.length < 2) continue;
-
-    const look = {
+    if (pieces.length < 2) continue;
+    const extras = pieces.slice(1);
+    const bag = extras.find((piece) => PIECE_SLOTS.bag.categories.includes(piece.category));
+    looks.push({
       id: `piece-${Date.now()}-${index}-${Math.random().toString(16).slice(2)}`,
       baseId: base.id,
-      name: makePieceLookNames(index, style),
-      pieces: unique,
-      style,
+      name: makeLookName(index, wantedStyle),
+      pieces,
+      style: wantedStyle,
       occasion,
-      reason: `${base.name} ganha equilíbrio quando combinado com peças cadastradas no seu closet que dialogam com sua cor, estampa e estilo ${style} para ${occasion}.`,
+      reason: explainLook(base, extras, wantedStyle),
+      accessories: bag ? `Complete com ${bag.name.toLowerCase()}.` : "Complete com uma bolsa do seu estilo.",
+      occasions: occasion,
       favorite: false
-    };
-    looks.push(look);
+    });
   }
 
   if (!looks.length) {
-    pieceLookResults.hidden = false;
-    pieceLookGrid.innerHTML = '<div class="saved-empty"><span>＋</span><h3>Peças insuficientes</h3><p>Adicione uma blusa ou calça e um calçado para formar combinações completas.</p></div>';
+    showPieceMessage("＋", "Ainda não tenho peças para combinar", "Adicione mais peças pelo botão “Adicionar peça”.");
     return;
   }
 
+  pieceMissingLabels = [...missing];
   pieceGeneratedLooks = looks;
-  pieceHistory.unshift({ baseId: base.id, baseName: base.name, createdAt: Date.now(), looks });
+  pieceHistory.unshift({ baseId: base.id, baseName: base.name, createdAt: Date.now(), looks, missing: pieceMissingLabels });
   pieceHistory = pieceHistory.slice(0, 12);
   persistPieceHistory();
   renderPieceLooks();
@@ -1393,13 +1140,21 @@ function generatePieceLooks(more = false) {
 
 function renderPieceLooks() {
   pieceLookGrid.innerHTML = "";
+  pieceMissingLabels.forEach((label) => {
+    const note = document.createElement("p");
+    note.className = "piece-alternative-note";
+    note.style.gridColumn = "1 / -1";
+    note.textContent = `Ainda não tenho ${label} no catálogo, então usei uma foto de referência.`;
+    pieceLookGrid.appendChild(note);
+  });
+
   pieceGeneratedLooks.forEach((look) => {
     const card = document.createElement("article");
     card.className = "piece-look-card";
-    const previewPieces = look.pieces.slice(0, 3);
     const isFavorite = savedLooks.some((saved) => saved.id === look.id);
 
-    card.innerHTML = `<div class="piece-look-preview">${previewPieces.map((piece) => `<img src="${piece.image}" alt="${piece.name}">`).join("")}</div>
+    // Fotos lado a lado: uma coluna para cada peça do look.
+    card.innerHTML = `<div class="piece-look-preview" style="grid-template-columns: repeat(${look.pieces.length}, 1fr)">${look.pieces.map((piece) => `<img src="${piece.image}" alt="${piece.name}">`).join("")}</div>
       <div class="piece-look-body">
         <div class="piece-look-heading"><div><p class="section-kicker">Com sua peça</p><h4>${look.name}</h4></div><button class="favorite-look ${isFavorite ? "active" : ""}" type="button" aria-label="Favoritar combinação">${isFavorite ? "♥" : "♡"}</button></div>
         <div class="piece-tags"><span>${look.style}</span><span>${look.occasion}</span></div>
@@ -1416,30 +1171,52 @@ function renderPieceLooks() {
     const favoriteButtons = [card.querySelector(".favorite-look"), card.querySelector('[data-action="favorite"]')];
     favoriteButtons.forEach((button) => button.addEventListener("click", () => togglePieceFavorite(look, button)));
 
+    const base = look.pieces.find((piece) => piece.id === look.baseId) || look.pieces[0];
+    const note = card.querySelector(".piece-alternative-note");
+
     card.querySelector('[data-action="swap"]').addEventListener("click", () => {
-      const swappable = look.pieces.find((piece) => piece.id !== selectedBasePiece.id);
-      if (!swappable) return;
-      const replacement = getPieceAlternatives(swappable.category, selectedBasePiece.id, Math.floor(Math.random() * 20), look.pieces.map((piece) => piece.id));
-      if (!replacement) {
-        card.querySelector(".piece-alternative-note").textContent = "Não há outra peça dessa categoria no seu guarda-roupa.";
-      } else {
-        look.pieces = look.pieces.map((piece) => piece.id === swappable.id ? replacement : piece);
-        renderPieceLooks();
+      const extras = look.pieces.filter((piece) => piece.id !== base.id);
+      const swappable = extras[Math.floor(Math.random() * extras.length)];
+      const slotName = swappable && Object.keys(PIECE_SLOTS).find((name) => PIECE_SLOTS[name].categories.includes(swappable.category));
+      const others = look.pieces.filter((piece) => piece !== swappable);
+      const replacement = slotName ? pickBestPiece(slotName, base, others, look.style, [swappable.id]) : null;
+      if (!replacement || replacement.id === swappable.id) {
+        note.textContent = "Ainda não tenho outra peça desse tipo no catálogo.";
+        note.hidden = false;
+        return;
       }
-      card.querySelector(".piece-alternative-note").hidden = false;
+      look.pieces = look.pieces.map((piece) => piece === swappable ? replacement : piece);
+      look.reason = explainLook(base, look.pieces.filter((piece) => piece.id !== base.id), look.style);
+      renderPieceLooks();
     });
 
     card.querySelector('[data-action="alternatives"]').addEventListener("click", () => {
-      const note = card.querySelector(".piece-alternative-note");
-      const alternatives = ["tops", "bottoms", "skirts", "shoes", "accessories"]
-        .map((category) => wardrobePieces.filter((piece) => piece.category === category).slice(0, 2).map((piece) => piece.name))
-        .flat().filter((name, index, names) => names.indexOf(name) === index).slice(0, 6);
-      note.textContent = alternatives.length ? `Opções já cadastradas: ${alternatives.join(" · ")}` : "Adicione mais peças ao guarda-roupa para ver alternativas.";
+      const lookIds = look.pieces.map((piece) => piece.id);
+      const alternatives = getSlotsForPiece(base.category)
+        .flatMap((slotName) => getAllPieces()
+          .filter((piece) => PIECE_SLOTS[slotName].categories.includes(piece.category) && !lookIds.includes(piece.id))
+          .slice(0, 2))
+        .map((piece) => piece.name);
+      note.textContent = alternatives.length ? `Outras opções: ${alternatives.join(" · ")}` : "Ainda não tenho outras opções no catálogo.";
       note.hidden = false;
     });
     pieceLookGrid.appendChild(card);
   });
 }
+
+function generatePieceLooksWithStyle(style) {
+  document.getElementById("pieceStylePreference").value = style;
+  generatePieceLooks();
+}
+
+if (pieceGenerateButton) pieceGenerateButton.addEventListener("click", () => generatePieceLooks());
+if (pieceMoreLooksButton) pieceMoreLooksButton.addEventListener("click", () => generatePieceLooks());
+if (pieceElegantButton) pieceElegantButton.addEventListener("click", () => generatePieceLooksWithStyle("elegante"));
+if (pieceCasualButton) pieceCasualButton.addEventListener("click", () => generatePieceLooksWithStyle("casual"));
+if (pieceHistoryButton) pieceHistoryButton.addEventListener("click", () => {
+  renderPieceHistory();
+  pieceHistoryPanel.hidden = !pieceHistoryPanel.hidden;
+});
 
 function togglePieceFavorite(look, clickedButton) {
   const existing = savedLooks.findIndex((saved) => saved.id === look.id);
@@ -1465,9 +1242,10 @@ function renderPieceHistory() {
     card.className = "piece-look-card";
     card.innerHTML = `<div class="piece-look-body"><p class="section-kicker">${new Date(entry.createdAt).toLocaleDateString("pt-BR")}</p><h4>${entry.baseName}</h4><p>${entry.looks.length} combinações geradas</p><button class="new-looks-button piece-history-reopen" type="button">Ver combinações</button></div>`;
     card.querySelector(".piece-history-reopen").addEventListener("click", () => {
-      const base = wardrobePieces.find((piece) => piece.id === entry.baseId);
+      const base = getAllPieces().find((piece) => piece.id === entry.baseId);
       if (base) selectBasePiece(base.id);
       pieceGeneratedLooks = entry.looks;
+      pieceMissingLabels = entry.missing || [];
       pieceLookResults.hidden = false;
       pieceHistoryPanel.hidden = true;
       renderPieceLooks();
@@ -1486,7 +1264,18 @@ const COMPLEMENTARY_REFERENCES = {
   shorts: [{name:"Short bege",image:"https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=700&q=80"},{name:"Short jeans",image:"https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=700&q=80"}],
   tops: [{name:"Blusa branca",image:"https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=700&q=80"},{name:"Camiseta preta",image:"https://images.unsplash.com/photo-1503341504253-dff4815485f1?auto=format&fit=crop&w=700&q=80"},{name:"Camisa oversized",image:"https://images.unsplash.com/photo-1605763240000-7e93b172d754?auto=format&fit=crop&w=700&q=80"}],
   shoes: [{name:"Tênis branco",image:"https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=700&q=80"},{name:"Sapato nude",image:"https://images.unsplash.com/photo-1543163521-1bf539c55dd2?auto=format&fit=crop&w=700&q=80"},{name:"Sandália delicada",image:"https://images.unsplash.com/photo-1543163521-1bf539c55dd2?auto=format&fit=crop&w=700&q=80"}],
-  accessories: [{name:"Bolsa estruturada",image:"https://images.unsplash.com/photo-1584917865442-de89df
+  accessories: [{name:"Bolsa estruturada",image:"https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=700&q=80"}]
+};
+
+// Devolve uma peça de referência (foto do Unsplash) quando falta essa categoria no closet.
+function getComplementaryReference(category, offset, style) {
+  const references = (COMPLEMENTARY_REFERENCES[category] || []).map((ref, index) => ({
+    ...ref,
+    id: `ref-${category}-${index}`,
+    category,
+    style: "referência"
+  }));
+  const filtered = references.filter((ref) => {
     if (style === "streetwear") return !ref.name.toLowerCase().includes("saia") && !ref.name.toLowerCase().includes("vestido");
     if (style === "minimalista") return !ref.name.toLowerCase().includes("estampado") && !ref.name.toLowerCase().includes("brilho");
     return true;
