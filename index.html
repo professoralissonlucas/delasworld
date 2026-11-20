@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#ff7eb6">
+  <meta name="application-name" content="DELA'S WORLD">
+  <meta name="apple-mobile-web-app-title" content="DELA'S WORLD">
+  <meta name="description" content="DELA'S WORLD — jogos, estilo e consultoria de moda.">
+  <title>DELA'S WORLD</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="sparkles" aria-hidden="true">
+    <span>✦</span><span>✧</span><span>✦</span><span>✧</span><span>✦</span><span>✧</span><span>✦</span><span>✧</span>
+  </div>
+
+  <main class="page-shell">
+    <header class="hero">
+      <div class="brand-mark" aria-hidden="true"><span>DW</span></div>
+      <div class="hero-title">
+        <p class="eyebrow">MINI MUNDO DE DIVERSÃO</p>
+        <h1><span>DELA'S</span> WORLD</h1>
+      </div>
+      <div class="hero-actions">
+        <div class="star-counter" aria-label="Estrelas conquistadas">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="m12 3 2.7 5.4 6 .9-4.3 4.2 1 5.9-5.4-2.8-5.4 2.8 1-5.9-4.3-4.2 6-.9z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+          <strong id="starCount">0</strong>
+        </div>
+        <button class="sound-button" id="soundButton" type="button" aria-label="Ativar som" aria-pressed="false">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M11 5 6.5 9H3v6h3.5l4.5 4zm4.5 4.5a5 5 0 0 1 0 5M18 7a8 8 0 0 1 0 10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <section class="menu-view" id="menuView">
+      <div class="menu-heading">
+        <p class="section-kicker">Escolha sua aventura</p>
+        <h2>Qual será seu jogo hoje?</h2>
+      </div>
+
+      <div class="game-grid">
+        <article class="game-card">
+          <div class="card-icon memory-icon" aria-hidden="true">
+            <svg viewBox="0 0 64 64"><rect x="12" y="12" width="40" height="40" rx="12" fill="none" stroke="currentColor" stroke-width="3"/><rect x="20" y="20" width="24" height="24" rx="7" fill="currentColor" opacity=".12"/><circle cx="32" cy="32" r="5" fill="currentColor"/></svg>
+          </div>
+          <div class="card-copy">
+            <h3>Jogo da Memória</h3>
+            <p>Teste sua concentração combinando padrões.</p>
+          </div>
+          <button class="play-button" type="button" data-game="Jogo da Memória Kawaii">
+            <span>Jogar</span><span aria-hidden="true">→</span>
+          </button>
+        </article>
+
+        <article class="game-card">
+          <div class="card-icon quiz-icon" aria-hidden="true">
+            <svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="22" fill="none" stroke="currentColor" stroke-width="3"/><path d="M32 18a14 14 0 0 1 12 21c-3 5-9 4-12 9" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><circle cx="32" cy="38" r="3" fill="currentColor"/></svg>
+          </div>
+          <div class="card-copy">
+            <h3>Qual é a sua Vibe?</h3>
+            <p>Descubra o perfil que representa sua energia.</p>
+          </div>
+          <button class="play-button" type="button" data-game="Quiz: Qual é a sua Vibe?">
+            <span>Jogar</span><span aria-hidden="true">→</span>
+          </button>
+        </article>
+
+        <article class="game-card">
+          <div class="card-icon fashion-icon" aria-hidden="true">
+            <svg viewBox="0 0 64 64"><path d="M20 18h24l5 12-10 4-7-9-7 9-10-4z" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/><path d="M26 34h12l8 20H18z" fill="currentColor" opacity=".14"/><path d="M26 34h12l8 20H18z" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/></svg>
+          </div>
+          <div class="card-copy">
+            <h3>Estúdio de Moda</h3>
+            <p>Crie combinações exclusivas e encontre seu estilo.</p>
+          </div>
+          <button class="play-button" type="button" data-game="Estúdio de Moda (Dress Up)">
+            <span>Jogar</span><span aria-hidden="true">→</span>
+          </button>
+        </article>
+
+        <article class="game-card organizer-card">
+          <div class="card-icon organizer-icon" aria-hidden="true">
+            <svg viewBox="0 0 64 64"><path d="M22 14h20l7 10-9 5-8-7-8 7-9-5z" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/><path d="M24 29h16l10 21H14z" fill="currentColor" opacity=".12"/><path d="M24 29h16l10 21H14z" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/></svg>
+          </div>
+          <div class="card-copy">
+            <h3>Organizador de Looks</h3>
+            <p>Envie suas peças e monte combinações inteligentes.</p>
+          </div>
+          <button class="play-button" type="button" data-game="Organizador de Looks">
+            <span>Acessar</span><span aria-hidden="true">→</span>
+          </button>
+        </article>
+        
+        <!-- ORGANIZER_CARD_MARKER -->
+      </div>
+    </section>
+
+    <section class="game-view" id="gameView" aria-live="polite" hidden>
+      <div class="game-panel">
+        <button class="back-button" id="backButton" type="button">← Voltar ao Menu</button>
+        <div class="game-symbol" id="gameSymbol" aria-hidden="true">✨</div>
+        <p class="section-kicker">Jogo selecionado</p>
+        <h2 id="gameTitle"></h2>
+        <p class="game-message" id="gameMessage">A aventura está quase pronta para começar!</p>
+
+        <div class="memory-game" id="memoryGame" hidden>
+          <div class="memory-toolbar">
+            <div class="attempt-counter">
+              <span>Tentativas</span>
+              <strong id="attemptCount">0</strong>
+            </div>
+            <button class="reset-button" id="resetButton" type="button">↻ Reiniciar Jogo</button>
+          </div>
+          <div class="memory-board" id="memoryBoard" aria-label="Tabuleiro do jogo da memória"></div>
+          <div class="victory-message" id="victoryMessage" role="status" aria-live="polite" hidden></div>
+        </div>
+
+        <div class="vibe-quiz" id="vibeQuiz" hidden>
+          <div class="quiz-progress-row">
+            <span id="quizStepLabel">Pergunta 1 de 5</span>
+            <strong id="quizProgressText">20%</strong>
+          </div>
+          <div class="quiz-progress" role="progressbar" aria-label="Progresso do quiz" aria-valuemin="0" aria-valuemax="100" aria-valuenow="20">
+            <div class="quiz-progress-fill" id="quizProgressFill"></div>
+          </div>
+
+          <div class="quiz-question-card" id="quizQuestionCard">
+            <h3 id="quizQuestion"></h3>
+            <div class="quiz-options" id="quizOptions"></div>
+          </div>
+
+          <div class="vibe-result" id="vibeResult" role="status" aria-live="polite" hidden>
+            <div class="dossier-header">
+              <div class="vibe-result-emoji" id="vibeResultEmoji" aria-hidden="true"></div>
+              <div>
+                <p class="section-kicker">Dossiê de estilo</p>
+                <h3 id="vibeResultTitle"></h3>
+              </div>
+            </div>
+            <p class="dossier-description" id="vibeResultDescription"></p>
+            <div class="style-dossier-grid">
+              <article class="dossier-card">
+                <span class="dossier-index">01</span>
+                <h4>Peças-chave &amp; roupas</h4>
+                <ul id="dossierPieces"></ul>
+              </article>
+              <article class="dossier-card">
+                <span class="dossier-index">02</span>
+                <h4>Cortes &amp; cabelo</h4>
+                <ul id="dossierHair"></ul>
+              </article>
+              <article class="dossier-card">
+                <span class="dossier-index">03</span>
+                <h4>Paleta de unhas</h4>
+                <ul class="nail-list" id="dossierNails"></ul>
+              </article>
+              <article class="dossier-card">
+                <span class="dossier-index">04</span>
+                <h4>Essência &amp; estética</h4>
+                <p id="dossierEssence"></p>
+              </article>
+            </div>
+            <button class="quiz-restart-button" id="quizRestartButton" type="button">↻ Refazer Teste</button>
+          </div>
+        </div>
+
+        <div class="dressup-game" id="dressupGame" hidden>
+          <div class="dressup-stage" id="dressupStage" data-background="room">
+            <div class="stage-decor" aria-hidden="true"></div>
+            <svg class="fashion-character" viewBox="0 0 300 520" role="img" aria-label="Personagem personalizável">
+              <g id="hairBack">
+                <path d="M78 155 C73 88 112 48 150 48 C188 48 227 88 222 155 L210 248 C190 278 110 278 90 248 Z" fill="#5a385d"/> 
+              </g>
+              <ellipse cx="150" cy="145" rx="74" ry="92" fill="#ffd7c2" stroke="#d99ca2" stroke-width="3"/>
+              <path d="M85 126 C88 65 120 47 151 47 C182 47 214 66 216 126 C188 101 112 99 85 126Z" fill="#5a385d" id="hairTop"/>
+              <path d="M94 118 C82 143 82 183 95 207 C72 198 65 163 73 135Z" fill="#5a385d" id="hairLeft"/>
+              <path d="M206 118 C218 143 218 183 205 207 C228 198 235 163 227 135Z" fill="#5a385d" id="hairRight"/>
+              <ellipse cx="119" cy="151" rx="7" ry="9" fill="#6a3d59"/>
+              <ellipse cx="181" cy="151" rx="7" ry="9" fill="#6a3d59"/>
+              <circle cx="117" cy="148" r="2" fill="#fff"/>
+              <circle cx="179" cy="148" r="2" fill="#fff"/>
+              <path d="M137 183 Q150 193 163 183" fill="none" stroke="#c86d82" stroke-width="4" stroke-linecap="round"/>
+              <ellipse cx="103" cy="178" rx="12" ry="6" fill="#f6aaa9" opacity=".6"/>
+              <ellipse cx="197" cy="178" rx="12" ry="6" fill="#f6aaa9" opacity=".6"/>
+
+              <g id="dressModel">
+                <path d="M112 222 Q150 204 188 222 L223 425 Q150 455 77 425 Z" fill="#ef70a4" stroke="#b94f82" stroke-width="3"/>
+                <path d="M112 222 Q150 246 188 222 L176 268 Q150 280 124 268 Z" fill="#ff9fc2"/>
+                <circle cx="150" cy="286" r="8" fill="#ffd66b"/>
+              </g>
+
+              <g id="dressDetails">
+                <path d="M112 248 Q150 270 188 248" fill="none" stroke="#ffd66b" stroke-width="5"/>
+                <path d="M150 260 L150 420" stroke="#ffbdd5" stroke-width="4" stroke-dasharray="7 12" opacity=".8"/>
+              </g>
+
+              <path d="M112 225 Q82 260 68 329" fill="none" stroke="#ffd7c2" stroke-width="25" stroke-linecap="round"/>
+              <path d="M188 225 Q218 260 232 329" fill="none" stroke="#ffd7c2" stroke-width="25" stroke-linecap="round"/>
+              <ellipse cx="67" cy="337" rx="15" ry="18" fill="#ffd7c2"/>
+              <ellipse cx="233" cy="337" rx="15" ry="18" fill="#ffd7c2"/>
+
+              <g id="accessoryCrown" hidden>
+                <path d="M105 68 L112 32 L132 58 L150 22 L168 58 L188 32 L195 68Z" fill="#ffd75e" stroke="#c49b35" stroke-width="3"/>
+                <circle cx="150" cy="48" r="6" fill="#ef70a4"/>
+              </g>
+              <g id="accessoryBow" hidden>
+                <path d="M150 107 C124 87 105 91 112 112 C118 132 145 126 150 116 C155 126 182 132 188 112 C195 91 176 87 150 107Z" fill="#ef70a4" stroke="#c94f83" stroke-width="3"/>
+              </g>
+              <g id="accessoryGlasses" hidden>
+                <rect x="99" y="137" width="48" height="32" rx="12" fill="#6d506f" opacity=".82" stroke="#4b354e" stroke-width="3"/>
+                <rect x="153" y="137" width="48" height="32" rx="12" fill="#6d506f" opacity=".82" stroke="#4b354e" stroke-width="3"/>
+                <path d="M147 151 H153" stroke="#4b354e" stroke-width="4"/>
+              </g>
+            </svg>
+            <div class="stage-sparkle stage-sparkle-one" aria-hidden="true">✦</div>
+            <div class="stage-sparkle stage-sparkle-two" aria-hidden="true">✧</div>
+            <div class="saved-look-message" id="savedLookMessage" hidden>Seu look ficou incrível! 💖</div>
+          </div>
+
+          <div class="dressup-controls">
+            <div class="dressup-category">
+              <h3>Cabelo</h3>
+              <div class="style-options" data-category="hair">
+                <button type="button" class="style-option active" data-value="chocolate" style="--swatch:#5a385d" aria-label="Cabelo castanho"></button>
+                <button type="button" class="style-option" data-value="pink" style="--swatch:#d95e98" aria-label="Cabelo rosa"></button>
+                <button type="button" class="style-option" data-value="lilac" style="--swatch:#9a78c7" aria-label="Cabelo lilás"></button>
+                <button type="button" class="style-option" data-value="gold" style="--swatch:#d5a64d" aria-label="Cabelo dourado"></button>
+              </div>
+            </div>
+
+            <div class="dressup-category">
+              <h3>Vestido</h3>
+              <div class="style-options" data-category="dress">
+                <button type="button" class="style-option dress-swatch active" data-value="pink" style="--swatch:#ef70a4" aria-label="Vestido rosa"></button>
+                <button type="button" class="style-option dress-swatch" data-value="lilac" style="--swatch:#9b82d1" aria-label="Vestido lilás"></button>
+                <button type="button" class="style-option dress-swatch" data-value="blue" style="--swatch:#63b8d8" aria-label="Vestido azul"></button>
+                <button type="button" class="style-option dress-swatch" data-value="gold" style="--swatch:#ddb85d" aria-label="Vestido dourado"></button>
+              </div>
+            </div>
+
+            <div class="dressup-category">
+              <h3>Acessório</h3>
+              <div class="style-options" data-category="accessory">
+                <button type="button" class="style-option label-option active" data-value="none">Nenhum</button>
+                <button type="button" class="style-option label-option" data-value="crown">Coroa</button>
+                <button type="button" class="style-option label-option" data-value="bow">Laço</button>
+                <button type="button" class="style-option label-option" data-value="glasses">Óculos</button>
+              </div>
+            </div>
+
+            <div class="dressup-category">
+              <h3>Cenário</h3>
+              <div class="style-options" data-category="background">
+                <button type="button" class="style-option label-option active" data-value="room">🏠 Rosa</button>
+                <button type="button" class="style-option label-option" data-value="beach">🏖️ Praia</button>
+                <button type="button" class="style-option label-option" data-value="stage">⭐ Palco</button>
+              </div>
+            </div>
+
+            <div class="dressup-actions">
+              <button type="button" class="random-look-button" id="randomLookButton">✨ Look Aleatório</button>
+              <button type="button" class="save-look-button" id="saveLookButton">💖 Salvar Look</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="outfit-organizer" id="outfitOrganizer" hidden>
+          <div class="organizer-layout">
+            <aside class="organizer-upload-panel">
+              <div class="organizer-section-heading">
+                <div>
+                  <p class="section-kicker">Seu guarda-roupa</p>
+                  <h3>Adicionar peças</h3>
+                </div>
+                <span class="piece-counter" id="pieceCounter">0 peças</span>
+              </div>
+
+              <label class="upload-dropzone" id="uploadDropzone" for="outfitUpload">
+                <input id="outfitUpload" type="file" accept="image/jpeg,image/png,image/webp" multiple capture="environment">
+                <span class="upload-icon" aria-hidden="true">＋</span>
+                <strong>Enviar fotos das peças</strong>
+                <small>Galeria ou câmera · JPG, PNG ou WEBP</small>
+              </label>
+
+              <p class="upload-error" id="uploadError" role="alert" hidden></p>
+
+              <div class="preference-grid">
+                <label>Estilo
+                  <select id="stylePreference">
+                    <option value="casual">Casual</option><option value="elegante">Elegante</option>
+                    <option value="romantico">Romântico</option><option value="streetwear">Streetwear</option>
+                    <option value="minimalista">Minimalista</option><option value="patricinha">Patricinha</option>
+                  </select>
+                </label>
+                <label>Ocasião
+                  <select id="occasionPreference">
+                    <option value="dia a dia">Dia a dia</option><option value="faculdade">Faculdade</option>
+                    <option value="passeio">Passeio</option><option value="festa">Festa</option>
+                    <option value="encontro">Encontro</option><option value="trabalho">Trabalho</option>
+                  </select>
+                </label>
+                <label>Preferência
+                  <select id="moodPreference">
+                    <option value="confortavel">Confortável</option><option value="basico">Básico</option>
+                    <option value="sofisticado">Sofisticado</option><option value="ousado">Ousado</option>
+                  </select>
+                </label>
+              </div>
+
+              <button class="assemble-button" id="assembleLooksButton" type="button" disabled>
+                <span>✦</span> Montar meus looks
+              </button>
+              <button class="secondary-organizer-button" id="showSavedLooksButton" type="button">♡ Ver looks salvos</button>
+            </aside>
+
+            <section class="organizer-content">
+              <div class="organizer-tabs" role="tablist">
+                <button class="organizer-tab active" type="button" data-tab="wardrobe" role="tab">Guarda-roupa</button>
+                <button class="organizer-tab" type="button" data-tab="piece" role="tab">Combinar uma peça</button>
+                <button class="organizer-tab" type="button" data-tab="results" role="tab">Meus looks</button>
+              </div>
+
+              <div class="wardrobe-view" id="wardrobeView">
+                <div class="wardrobe-empty" id="wardrobeEmpty">
+                  <span aria-hidden="true">👗</span>
+                  <h3>Comece seu closet digital</h3>
+                  <p>Adicione blusas, calças, vestidos e acessórios para criar combinações.</p>
+                </div>
+                <div class="category-sections" id="categorySections"></div>
+              </div>
+
+              <div class="look-results-view" id="lookResultsView" hidden>
+                <div class="looks-toolbar">
+                  <div><p class="section-kicker">Sugestões personalizadas</p><h3>Combinações para você</h3></div>
+                  <button class="new-looks-button" id="newLooksButton" type="button">↻ Novos looks</button>
+                </div>
+                <div class="look-results-grid" id="lookResultsGrid"></div>
+              </div>
+
+              <div class="saved-looks-view" id="savedLooksView" hidden>
+                <div class="looks-toolbar">
+                  <div><p class="section-kicker">Sua coleção</p><h3>Looks favoritos</h3></div>
+                </div>
+                <div class="look-results-grid" id="savedLooksGrid"></div>
+              </div>
+            </section>
+          </div>
+        </div>
+
+        <div class="piece-match-view" id="pieceMatchView" hidden>
+          <div class="piece-match-heading">
+            <div>
+              <p class="section-kicker">Consultoria pessoal</p>
+              <h3>O que combina com essa peça?</h3>
+            </div>
+            <button class="piece-history-button" id="pieceHistoryButton" type="button">⟳ Histórico</button>
+          </div>
+
+          <div class="piece-match-preferences">
+            <label>Estilo desejado
+              <select id="pieceStylePreference">
+                <option value="casual">Casual</option><option value="elegante">Elegante</option>
+                <option value="romantico">Romântico</option><option value="clean">Clean girl</option>
+                <option value="pinterest">Pinterest girl</option><option value="streetwear">Streetwear</option>
+                <option value="minimalista">Minimalista</option><option value="aesthetic">Aesthetic</option>
+                <option value="sofisticado">Sofisticado</option>
+              </select>
+            </label>
+            <label>Ocasião
+              <select id="pieceOccasionPreference">
+                <option value="dia a dia">Dia a dia</option><option value="faculdade">Faculdade ou escola</option>
+                <option value="passeio">Passeio</option><option value="encontro">Encontro</option>
+                <option value="festa">Festa</option><option value="trabalho">Trabalho</option>
+              </select>
+            </label>
+          </div>
+
+          <div class="piece-filter-row" id="pieceFilterRow" aria-label="Filtrar peças por categoria">
+            <button type="button" class="piece-filter active" data-category="all">Todas</button>
+            <button type="button" class="piece-filter" data-category="tops">Blusas</button>
+            <button type="button" class="piece-filter" data-category="pants">Calças</button>
+            <button type="button" class="piece-filter" data-category="shorts">Shorts</button>
+            <button type="button" class="piece-filter" data-category="outerwear">Jaquetas</button>
+            <button type="button" class="piece-filter" data-category="sets">Conjuntos</button>
+            <button type="button" class="piece-filter" data-category="sneakers_shoes">Tênis e sapatos</button>
+            <button type="button" class="piece-filter" data-category="sandals">Sandálias</button>
+            <button type="button" class="piece-filter" data-category="bags">Bolsas</button>
+            <button type="button" class="piece-filter" data-category="skirts">Saias</button>
+            <button type="button" class="piece-filter" data-category="dresses">Vestidos</button>
+            <button type="button" class="piece-filter" data-category="accessories">Acessórios</button>
+          </div>
+
+          <div class="selected-piece-stage" id="selectedPieceStage">
+            <div class="selected-piece-placeholder">
+              <span>✦</span>
+              <p>Escolha uma peça abaixo para começar</p>
+            </div>
+          </div>
+
+          <div class="piece-picker-heading">
+            <h4>Escolha sua peça principal</h4>
+            <label class="mini-upload-button" for="pieceMatchUpload">＋ Adicionar peça</label>
+            <input id="pieceMatchUpload" type="file" accept="image/jpeg,image/png,image/webp" capture="environment" hidden>
+          </div>
+          <div class="piece-match-picker" id="pieceMatchPicker"></div>
+
+          <button class="piece-generate-button" id="pieceGenerateButton" type="button" disabled>
+            ✦ Encontrar combinações
+          </button>
+
+          <div class="piece-look-results" id="pieceLookResults" hidden>
+            <div class="looks-toolbar piece-look-toolbar">
+              <div><p class="section-kicker">Combinações reais do seu closet</p><h3>Looks com sua peça</h3></div>
+              <div class="piece-look-option-buttons">
+                <button class="new-looks-button" id="pieceMoreLooksButton" type="button">Ver outras combinações</button>
+                <button class="new-looks-button elegant" id="pieceElegantButton" type="button">Quero um look mais elegante</button>
+                <button class="new-looks-button casual" id="pieceCasualButton" type="button">Quero algo mais casual</button>
+              </div>
+            </div>
+            <div class="piece-look-grid" id="pieceLookGrid"></div>
+          </div>
+
+          <div class="piece-history-panel" id="pieceHistoryPanel" hidden>
+            <div class="looks-toolbar">
+              <div><p class="section-kicker">Sugestões anteriores</p><h3>Histórico de combinações</h3></div>
+            </div>
+            <div class="piece-history-grid" id="pieceHistoryGrid"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
